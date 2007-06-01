@@ -1,0 +1,59 @@
+<project name="HotSwap" default="compile" basedir=".">
+	<property name="hotswap.build" value="build"/>
+	<property name="hotswap.classes" value="${hotswap.build}/classes"/>
+	<property name="hotswap.src" value="java"/>
+	<property name="hotswap.jar" value="${hotswap.build}/jar"/>
+	<property name="hotswap.jar.file" value="${hotswap.jar}/hotswap.jar"/>
+
+	<path id="classpath.compile" >
+		<pathelement location="${hotswap.classes}" />
+	</path>
+
+	<target name="init">
+		<mkdir dir="${hotswap.build}" />
+		<mkdir dir="${hotswap.classes}" />
+        <mkdir dir="${hotswap.jar}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<javac destdir="${hotswap.classes}" srcdir="${hotswap.src}" classpathref="classpath.compile" debug="YES" deprecation="yes"/>
+	</target>
+
+	<target name="jar" depends="compile">
+        <jar destfile="${hotswap.jar.file}" basedir="${hotswap.classes}"/>
+	</target>
+
+	<target name="clean" description="Deletes all the generated artifacts.">
+		<delete dir="${hotswap.build}" />
+	</target>
+
+	<!-- this is sample build stuff that shows how to use the hotswap target -->
+
+	<taskdef name="hotswap" classname="dak.ant.taskdefs.Hotswap"/>
+
+	<target name="hotswap">
+		<tstamp>
+			<format property="class.tstamp" pattern="MM/dd/yyyy kk:mm:ss" />
+		</tstamp>
+		<echo message="${class.tstamp}"/>
+
+		<javac destdir="${hotswap.classes}" srcdir="${hotswap.src}" classpathref="classpath.compile" debug="YES" deprecation="yes"/>
+
+		<hotswap verbose="true" port="9000">
+			<fileset dir="${hotswap.classes}" includes="**/*.class">
+				<date datetime="${class.tstamp}" pattern="MM/dd/yyyy kk:mm:ss" when="after" granularity="0"/>
+			</fileset>
+		</hotswap>
+	</target>
+
+	<target name="test" depends="compile">
+		<java classname="dak.test.TestSwap" fork="yes">
+			<classpath>
+				<path refid="classpath.compile"/>
+			</classpath>
+			<jvmarg line="-Xdebug -Xrunjdwp:transport=dt_socket,address=9000,server=y,suspend=n"/>
+		</java>
+	</target>
+
+
+</project>
