@@ -69,7 +69,7 @@ public class HotSwapHelper {
 //			Object val = args.get(key);
 //			System.err.println("key:"+key.toString()+" = "+val.toString());
 //		}
-      	Connector.Argument arg;
+		Connector.Argument arg;
 		// use name if using dt_shmem
 		if (!useSocket) {
 			arg = (Connector.Argument)args.get("name");
@@ -96,17 +96,18 @@ public class HotSwapHelper {
 		// load class(es)
 		byte [] classBytes = loadClassFile(classFile);
 		// redefine in JVM
-      	List classes = vm.classesByName(className);
+		List classes = vm.classesByName(className);
 
 		// if the class isn't loaded on the VM, can't do the replace.
 		if (classes == null || classes.size() == 0)
 			return;
 
-		// for now, just grab the first ref.
-		ReferenceType refType = (ReferenceType)classes.get(0);
-		HashMap map = new HashMap();
-      	map.put(refType, classBytes);
-		vm.redefineClasses(map);
+		for (int i=0; i<classes.size(); i++) {
+			ReferenceType refType = (ReferenceType)classes.get(i);
+			HashMap map = new HashMap();
+			map.put(refType, classBytes);
+			vm.redefineClasses(map);
+		}
 //		System.err.println("class replaced!");
 	}
 
