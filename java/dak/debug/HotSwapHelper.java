@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -107,11 +108,22 @@ public class HotSwapHelper {
 		if (classes == null || classes.size() == 0)
 			return;
 
+		int successes = 0;
+		List<Exception> errors = new LinkedList<Exception>();
 		for (int i=0; i<classes.size(); i++) {
 			ReferenceType refType = (ReferenceType)classes.get(i);
 			HashMap map = new HashMap();
 			map.put(refType, classBytes);
-			vm.redefineClasses(map);
+			try {
+			    vm.redefineClasses(map);
+			    successes++;
+			} catch (Exception e) {
+			    errors.add(e);
+			}
+		}
+		if (!errors.isEmpty()) {
+			if (successes == 0) throw errors.get(0);
+			System.err.println(className + " has multiple occurences: " + successes + " were succesfully reloaded, " + errors.size() + " failed (" + errors.get(0) + ")");
 		}
 //		System.err.println("class replaced!");
 	}
