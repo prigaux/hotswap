@@ -79,6 +79,11 @@ public class HotSwapHelper {
 		else {
 			arg = (Connector.Argument)args.get("port");
 			arg.setValue(port);
+
+			if (host != null) {
+				arg = (Connector.Argument)args.get("hostname");
+				arg.setValue(host);
+			}
 		}
 		vm = connector.attach(args);
 
