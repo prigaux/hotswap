@@ -4,6 +4,7 @@
 	<property name="hotswap.src" value="java"/>
 	<property name="hotswap.jar" value="${hotswap.build}/jar"/>
 	<property name="hotswap.jar.file" value="${hotswap.jar}/hotswap.jar"/>
+	<property name="javac.target" value="8"/>
 
 	<path id="classpath.compile" >
 		<pathelement location="${hotswap.classes}" />
@@ -16,7 +17,7 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac destdir="${hotswap.classes}" srcdir="${hotswap.src}" classpathref="classpath.compile" debug="YES" deprecation="yes"/>
+		<javac destdir="${hotswap.classes}" srcdir="${hotswap.src}" source="${javac.target}" target="${javac.target}" classpathref="classpath.compile" debug="YES" deprecation="yes"/>
 	</target>
 
 	<target name="jar" depends="compile">
